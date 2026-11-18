@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurgerKilat - Pesan Makanan Cepat Saji Online</title>
+    <style>
+        /* Reset & Variabel Warna */
+        :root {
+            --primary: #e63946;
+            --secondary: #ffb703;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--light);
+            color: #333;
+        }
+
+        /* Navbar */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .logo span {
+            color: var(--secondary);
+        }
+        .cart-btn {
+            background-color: var(--secondary);
+            color: var(--dark);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        .cart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=1200&q=80') center/cover;
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #eee;
+        }
+
+        /* Filter Kategori */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 30px 5% 10px;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Daftar Menu */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            padding: 30px 5%;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .card-body {
+            padding: 18px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-btn:hover {
+            background: #c1121f;
+        }
+
+        /* Modal Keranjang Belanja */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: flex-end;
+        }
+        .cart-sidebar {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .cart-items {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f1f1f1;
+            padding-bottom: 10px;
+        }
+        .qty-controls button {
+            background: #eee;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .cart-footer {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .checkout-btn {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .checkout-btn:hover {
+            background: #1ebe5d;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">Burger<span>Kilat</span></div>
+        <button class="cart-btn" onclick="toggleCart()">
+            🛒 Keranjang (<span id="cart-count">0</span>)
+        </button>
+    </header>
+
+    <!-- Banner -->
+    <section class="hero">
+        <h1>Lapar? Pesan Sekarang, Antar Kilat!</h1>
+        <p>Nikmati burger juicy, ayam renyah, dan kentang goreng hangat langsung ke rumahmu.</p>
+    </section>
+
+    <!-- Kategori -->
+    <div class="categories">
+        <button class="cat-btn active" onclick="filterMenu('semua', this)">Semua Menu</button>
+        <button class="cat-btn" onclick="filterMenu('burger', this)">Burger</button>
+        <button class="cat-btn" onclick="filterMenu('ayam', this)">Ayam & Kentang</button>
+        <button class="cat-btn" onclick="filterMenu('minuman', this)">Minuman</button>
+    </div>
+
+    <!-- Daftar Menu -->
+    <main class="menu-container" id="menu-list"></main>
+
+    <!-- Sidebar Keranjang -->
+    <div class="modal" id="cart-modal">
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h3>Pesanan Kamu</h3>
+                <button class="close-btn" onclick="toggleCart()">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <p style="color: gray; text-align: center; margin-top: 50px;">Keranjang masih kosong.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span id="cart-total">Rp 0</span>
+                </div>
+                <button class="checkout-btn" onclick="checkoutWA()">Pesan via WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BurgerKilat Fast Food. Buka Setiap Hari 10.00 - 22.00 WIB.</p>
+    </footer>
+
+    <script>
+        // Data Menu Makanan
+        const menuData = [
+            { id: 1, nama: "Double Cheese Burger", kategori: "burger", harga: 35000, desc: "Dua lapis daging sapi panggang dengan keju cheddar lumer.", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80" },
+            { id: 2, nama: "Crispy Chicken Burger", kategori: "burger", harga: 28000, desc: "Fillet dada ayam goreng renyah dengan saus mayones spesial.", img: "https://images.unsplash.com/photo-1615297928064-24977384d0da?auto=format&fit=crop&w=500&q=80" },
+            { id: 3, nama: "Paket Ayam Crispy (2 Pcs)", kategori: "ayam", harga: 32000, desc: "2 potong ayam goreng krispi bumbu rahasia + nasi hangat.", img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=500&q=80" },
+            { id: 4, nama: "French Fries Large", kategori: "ayam", harga: 18000, desc: "Kentang goreng renyah di luar, lembut di dalam.", img: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=500&q=80" },
+            { id: 5, nama: "Cola Dingin", kategori: "minuman", harga: 10000, desc: "Minuman bersoda segar dengan es batu.", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80" },
+            { id: 6, nama: "Chocolate Milkshake", kategori: "minuman", harga: 20000, desc: "Susu kocok cokelat pekat dengan krim kocok di atasnya.", img: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=500&q=80" }
+        ];
+
+        let cart = [];
+
+        // Format Rupiah
+        const formatRupiah = (angka) => "Rp " + angka.toLocaleString("id-ID");
+
+        // Tampilkan Menu
+        function renderMenu(kategori = "semua") {
+            const container = document.getElementById("menu-list");
+            container.innerHTML = "";
+
+            const filtered = kategori === "semua" ? menuData : menuData.filter(item => item.kategori === kategori);
+
+            filtered.forEach(item => {
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${item.img}" alt="${item.nama}">
+                        <div class="card-body">
+                            <div>
+                                <h3 class="card-title">${item.nama}</h3>
+                                <p class="card-desc">${item.desc}</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="price">${formatRupiah(item.harga)}</span>
+                                <button class="add-btn" onclick="addToCart(${item.id})">+ Tambah</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Filter Kategori
+        function filterMenu(kategori, btn) {
+            document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderMenu(kategori);
+        }
+
+        // Tambah ke Keranjang
+        function addToCart(id) {
+            const item = menuData.find(m => m.id === id);
+            const existing = cart.find(c => c.id === id);
+
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCart();
+        }
+
+        // Ubah Jumlah Item
+        function changeQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(c => c.id !== id);
+            }
+            updateCart();
+        }
+
+        // Perbarui Tampilan Keranjang
+        function updateCart() {
+            const cartItemsEl = document.getElementById("cart-items");
+            const cartCountEl = document.getElementById("cart-count");
+            const cartTotalEl = document.getElementById("cart-total");
+
+            let totalQty = 0;
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartItemsEl.innerHTML = `<p style="color: gray; text-align: center; margin-top: 50px;">Keranjang masih kosong.</p>`;
+            } else {
+                cartItemsEl.innerHTML = "";
+                cart.forEach(item => {
+                    totalQty += item.qty;
+                    totalPrice += item.harga * item.qty;
+                    cartItemsEl.innerHTML += `
+                        <div class="cart-item">
+                            <div>
+                                <strong>${item.nama}</strong><br>
+                                <small>${formatRupiah(item.harga)} x ${item.qty}</small>
+                            </div>
+                            <div class="qty-controls">
+                                <button onclick="changeQty(${item.id}, -1)">-</button>
+                                <span style="margin: 0 8px;">${item.qty}</span>
+                                <button onclick="changeQty(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            cartCountEl.innerText = totalQty;
+            cartTotalEl.innerText = formatRupiah(totalPrice);
+        }
+
+        // Buka/Tutup Keranjang
+        function toggleCart() {
+            const modal = document.getElementById("cart-modal");
+            modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+        }
+
+        // Checkout ke WhatsApp
+        function checkoutWA() {
+            if (cart.length === 0) {
+                alert("Keranjang kamu masih kosong!");
+                return;
+            }
+
+            let pesan = "Halo BurgerKilat, saya mau pesan:\n\n";
+            let total = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.harga * item.qty;
+                total += subtotal;
+                pesan += `- ${item.nama} (${item.qty}x) = ${formatRupiah(subtotal)}\n`;
+            });
+
+            pesan += `\n*Total Bayar: ${formatRupiah(total)}*\nAlamat pengiriman: `;
+
+            const noWA = "6285697194226";
+            const url = `https://wa.me/${noWA}?text=${encodeURIComponent(pesan)}`;
+            window.open(url, "_blank");
+        }
+
+        // Jalankan saat pertama kali dibuka
+        renderMenu();
+    </script>
+</body>
+</html>
